@@ -8,7 +8,7 @@ export class FarmsController {
     constructor(private farmsService: FarmsService) { }
 
     @Get()
-    async getAllFarms() :Promise<Farm[]> {
+    getAllFarms(): Promise<Farm[]> {
         return this.farmsService.getAllFarms();
     }
     // @Get()
@@ -18,7 +18,7 @@ export class FarmsController {
 
     @Post()
     @UsePipes(ValidationPipe)
-    async createFarm(@Body() createFarmDto: CreateFarmDto): Promise<Farm> {
+    createFarm(@Body() createFarmDto: CreateFarmDto): Promise<Farm> {
         return this.farmsService.createFarm(createFarmDto);
     }
     // @Post()
@@ -28,7 +28,7 @@ export class FarmsController {
     // }
 
     @Get('/:id')
-    async getFarmById(@Param('id') id: string): Promise<Farm> {
+    getFarmById(@Param('id') id: string): Promise<Farm> {
         return this.farmsService.getFarmById(id);
     }
     // @Get('/:id')
@@ -37,10 +37,10 @@ export class FarmsController {
     // }
 
     @Put('/:id')
-    async updateFarmById(
+    updateFarmById(
         @Param('id') id: string,
         @Body() createFarmDto: CreateFarmDto): Promise<Farm> {
-            return this.farmsService.updateFarmById(id, createFarmDto);
+        return this.farmsService.updateFarmById(id, createFarmDto);
     }
     // @Put('/:id')
     // updateFarmById(
@@ -50,8 +50,8 @@ export class FarmsController {
     // }
 
     @Delete('/:id')
-    async deleteFarm(@Param('id') id: string): Promise<void> {
-        this.farmsService.deleteFarm(id);
+    deleteFarm(@Param('id') id: string): Promise<void> {
+        return this.farmsService.deleteFarm(id);
     }
     // @Delete('/:id')
     // deleteFarm(@Param('id') id: string): void {

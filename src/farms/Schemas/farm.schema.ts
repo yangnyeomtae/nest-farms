@@ -9,8 +9,8 @@ const options: SchemaOptions = {
 
 @Schema(options)
 export class Farm {
-    @Prop()
-    name: string;
+    @Prop({ required: true })
+    name: String;
 
 }
 
