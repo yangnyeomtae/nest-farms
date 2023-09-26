@@ -4,11 +4,15 @@ import { CreateFarmDto } from './dto/createFarm.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Farm } from './Schemas/farm.schema';
+import { User } from 'src/auth/schemas/user.schema';
 
 
 @Injectable()
 export class FarmsService {
-    constructor(@InjectModel(Farm.name) private farmModel: Model<Farm>) { }
+    constructor(
+        @InjectModel(Farm.name) private farmModel: Model<Farm>,
+        @InjectModel(User.name) private userModel: Model<User>
+    ) { }
     // private farms: Farm[] = [
     //     {
     //         id: "1",
@@ -31,9 +35,12 @@ export class FarmsService {
     //     return this.farms;
     // }
 
-    async createFarm(createFarmDto: CreateFarmDto): Promise<Farm> {
+    async createFarm(createFarmDto: CreateFarmDto, req): Promise<Farm> {
+        const user = await this.userModel.findOne({ username: req.user.username });
         const farm = new this.farmModel(createFarmDto);
+        user.farms.push(farm);
         await farm.save();
+        await user.save();
         return farm;
     }
     // createFarm(createFarmDto: CreateFarmDto): Farm {
@@ -49,7 +56,7 @@ export class FarmsService {
 
     async getFarmById(id: string): Promise<Farm> {
         const farm = await this.farmModel.findById(id);
-        if(!farm) {
+        if (!farm) {
             throw new NotFoundException(`Cannot find #${id} farm!`);
         }
         return farm;

@@ -4,11 +4,14 @@ import { Model } from 'mongoose';
 import { User } from './schemas/user.schema';
 import { AuthCredentialsDto } from './dto/authCredential.dto';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt/dist';
 
 
 @Injectable()
 export class AuthService {
-    constructor(@InjectModel(User.name) private userModel: Model<User>) { }
+    constructor(
+        @InjectModel(User.name) private userModel: Model<User>,
+        private jwtService: JwtService) { }
 
     async signUp(authCredentialsDto: AuthCredentialsDto): Promise<User> {
         const { username, password } = authCredentialsDto;
@@ -30,12 +33,16 @@ export class AuthService {
         }
     }
 
-    async signIn(authCredentialsDto: AuthCredentialsDto): Promise<string> {
+    async signIn(authCredentialsDto: AuthCredentialsDto): Promise<{ accessToken: string }> {
         const { username, password } = authCredentialsDto;
         const user = await this.userModel.findOne({ username })
 
         if (user && await bcrypt.compare(password, user.password)) {
-            return 'login success!';
+            //유저 토큰 생성 ( Secret + Payload )
+            const payload = { username: user.username };
+            const accessToken = await this.jwtService.signAsync(payload);
+
+            return { accessToken };
         } else {
             throw new UnauthorizedException('login failed...');
         }

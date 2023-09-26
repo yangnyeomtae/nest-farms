@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Param, Body, Put, Delete, Render, Redirect, ValidationPipe, UsePipes } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, Put, Delete, Render, Redirect, ValidationPipe, UsePipes, UseGuards, Req } from '@nestjs/common';
 import { FarmsService } from './farms.service';
 import { CreateFarmDto } from './dto/createFarm.dto';
 import { Farm } from './Schemas/farm.schema';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('farms')
+@UseGuards(AuthGuard())
 export class FarmsController {
     constructor(private farmsService: FarmsService) { }
 
@@ -18,8 +20,8 @@ export class FarmsController {
 
     @Post()
     @UsePipes(ValidationPipe)
-    createFarm(@Body() createFarmDto: CreateFarmDto): Promise<Farm> {
-        return this.farmsService.createFarm(createFarmDto);
+    createFarm(@Body() createFarmDto: CreateFarmDto, @Req() req): Promise<Farm> {
+        return this.farmsService.createFarm(createFarmDto, req);
     }
     // @Post()
     // @UsePipes(ValidationPipe)
