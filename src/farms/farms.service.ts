@@ -35,8 +35,16 @@ export class FarmsService {
     //     return this.farms;
     // }
 
+    async getUsersFarms(req): Promise<Farm[]> {
+        const { username } = req.user;
+        const user = await this.userModel.findOne({ username }).populate('farms');
+        const farms = user.farms;
+        return farms;
+    }
+
     async createFarm(createFarmDto: CreateFarmDto, req): Promise<Farm> {
-        const user = await this.userModel.findOne({ username: req.user.username });
+        const { username } = req.user;
+        const user = await this.userModel.findOne({ username });
         const farm = new this.farmModel(createFarmDto);
         user.farms.push(farm);
         await farm.save();
@@ -81,9 +89,11 @@ export class FarmsService {
 
     // }
 
-    async deleteFarm(id: string): Promise<void> {
-        const farm = await this.farmModel.findByIdAndDelete(id);
-        console.log('result', farm);
+    async deleteFarm(farmId: string, req): Promise<string> {
+        const { username } = req.user;
+        await this.userModel.findOneAndUpdate({ username }, { $pull: { farms: farmId } })
+        await this.farmModel.findByIdAndDelete(farmId);
+        return "delete success";
     }
     // deleteFarm(id: string): void {
     //     const found = this.getFarmById(id);
